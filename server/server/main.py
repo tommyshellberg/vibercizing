@@ -18,6 +18,38 @@ DB_PATH = DATA_DIR / "vibercizing.db"
 _db: Database | None = None
 
 
+class ConnectionManager:
+    """Manages active WebSocket connections for broadcasting."""
+
+    def __init__(self):
+        self.active_connections: list[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def broadcast_balance(self, balance: Balance):
+        """Broadcast balance update to all connected clients."""
+        message = {
+            "type": "balance_update",
+            "requests_available": balance.requests_available,
+            "requests_earned": balance.requests_earned,
+            "requests_spent": balance.requests_spent,
+        }
+        for connection in self.active_connections:
+            try:
+                await connection.send_json(message)
+            except Exception:
+                # Connection may have closed, will be cleaned up on disconnect
+                pass
+
+
+manager = ConnectionManager()
+
+
 def get_db() -> Database:
     """Dependency to get the database instance."""
     if _db is None:
@@ -63,6 +95,9 @@ async def deduct_request(db: Annotated[Database, Depends(get_db)]) -> DeductResp
     success = await db.deduct_request()
     balance = await db.get_balance()
 
+    # Broadcast balance update to all connected WebSocket clients
+    await manager.broadcast_balance(balance)
+
     if success:
         return DeductResponse(
             success=True,
@@ -96,7 +131,7 @@ async def reset(db: Annotated[Database, Depends(get_db)]) -> dict:
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket) -> None:
     """WebSocket endpoint for real-time updates."""
-    await websocket.accept()
+    await manager.connect(websocket)
     db = get_db()
 
     # Send initial balance
@@ -145,7 +180,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                     })
 
     except WebSocketDisconnect:
-        pass
+        manager.disconnect(websocket)
 
 
 if __name__ == "__main__":
