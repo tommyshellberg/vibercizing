@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+
+# Build outputs
+dist/
+build/
+
+# Database
+data/
+*.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Lock files (optional - uncomment if you want to ignore)
+# package-lock.json
+# uv.lock
+
+# Test coverage
+coverage/
+.coverage
+htmlcov/
+
+# Environment
+.env
+.env.local
+
+# Claude Code local settings
+.claude/
+CLAUDE.md
