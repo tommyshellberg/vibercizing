@@ -2,5 +2,5 @@
   "name": "vibercizing",
   "version": "1.0.0",
   "description": "Earn Claude Code requests through exercise",
-  "hooks": "../hooks/hooks.json"
+  "hooks": "./hooks/hooks.json"
 }

@@ -1,0 +1,22 @@
+{
+  "name": "vibercizing",
+  "owner": {
+    "name": "Tommy Shellberg"
+  },
+  "metadata": {
+    "description": "Earn Claude Code requests through exercise"
+  },
+  "plugins": [
+    {
+      "name": "vibercizing",
+      "source": "./plugin",
+      "description": "Earn Claude Code requests through exercise",
+      "version": "1.0.0",
+      "author": {
+        "name": "Tommy Shellberg"
+      },
+      "license": "MIT",
+      "repository": "https://github.com/tommyshellberg/vibercizing"
+    }
+  ]
+}
