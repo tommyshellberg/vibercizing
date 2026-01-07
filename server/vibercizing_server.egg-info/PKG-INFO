@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: vibercizing-server
+Version: 0.1.0
+Summary: Backend server for Vibercizing - earn Claude Code requests through exercise
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+Requires-Dist: aiosqlite>=0.22.1
+Requires-Dist: fastapi>=0.128.0
+Requires-Dist: pydantic>=2.12.5
+Requires-Dist: uvicorn>=0.40.0
+Requires-Dist: websockets>=15.0.1

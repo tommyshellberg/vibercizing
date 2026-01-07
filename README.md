@@ -27,25 +27,38 @@ Open http://localhost:5173 and complete 20 jumping jacks to earn 1 request.
 - Node.js 18+
 - A webcam
 
-### 1. Start the Server
+### 1. Install Dependencies
 
 ```bash
-cd server
-uv sync
-uv run uvicorn server.main:app --reload
+# From repo root
+npm install
+
+# Server dependencies
+cd server && uv sync && cd ..
+
+# Client dependencies
+cd client && npm install && cd ..
 ```
 
-Server runs at http://localhost:8000
-
-### 2. Start the Client
+### 2. Start Development Servers
 
 ```bash
-cd client
-npm install
+# Start both client and server together (from repo root)
 npm run dev
 ```
 
-Client runs at http://localhost:5173
+- Server runs at http://localhost:8000
+- Client runs at http://localhost:5173
+
+Or start them individually:
+
+```bash
+# Server only (from server/)
+uv run serve
+
+# Client only (from client/)
+npm run dev
+```
 
 ### 3. Install the Plugin
 
@@ -103,6 +116,7 @@ npm test
 
 ```
 vibercizing/
+├── package.json      # Root scripts (npm run dev starts both)
 ├── server/           # FastAPI backend
 │   ├── server/       # Main package
 │   │   ├── main.py   # API endpoints + WebSocket

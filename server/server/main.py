@@ -183,7 +183,12 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
         manager.disconnect(websocket)
 
 
-if __name__ == "__main__":
+def main():
+    """Entry point for the server."""
     import uvicorn
 
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+if __name__ == "__main__":
+    main()

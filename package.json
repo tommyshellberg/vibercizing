@@ -1,0 +1,12 @@
+{
+  "name": "vibercizing",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --kill-others \"npm:dev:*\"",
+    "dev:client": "npm run dev --prefix client",
+    "dev:server": "cd server && uv run serve"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
