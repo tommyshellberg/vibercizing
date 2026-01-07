@@ -134,16 +134,16 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     await manager.connect(websocket)
     db = get_db()
 
-    # Send initial balance
-    balance = await db.get_balance()
-    await websocket.send_json({
-        "type": "balance_update",
-        "requests_available": balance.requests_available,
-        "requests_earned": balance.requests_earned,
-        "requests_spent": balance.requests_spent,
-    })
-
     try:
+        # Send initial balance
+        balance = await db.get_balance()
+        await websocket.send_json({
+            "type": "balance_update",
+            "requests_available": balance.requests_available,
+            "requests_earned": balance.requests_earned,
+            "requests_spent": balance.requests_spent,
+        })
+
         while True:
             data = await websocket.receive_json()
 

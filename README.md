@@ -62,17 +62,15 @@ npm run dev
 
 ### 3. Install the Plugin
 
-Copy the plugin directory to your Claude Code plugins folder, or symlink it:
+Install the plugin via Claude Code:
 
-```bash
-# macOS/Linux
-ln -s $(pwd)/plugin ~/.claude/plugins/vibercizing
+1. Run `/plugins` to open the plugin manager
+2. Add a marketplace source using this repository URL or local path:
+   - **Remote**: `https://github.com/tommyshellberg/vibercizing`
+   - **Local** (if you cloned the repo): path to the `plugin/` directory
+3. Install and activate the vibercizing plugin
 
-# Or copy
-cp -r plugin ~/.claude/plugins/vibercizing
-```
-
-Restart Claude Code. The plugin hooks into every message and checks your balance.
+The plugin hooks into every message and checks your balance.
 
 ## Architecture
 
