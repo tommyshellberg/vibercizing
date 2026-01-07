@@ -27,22 +27,27 @@ const LANDMARKS = {
   RIGHT_ANKLE: 28,
 } as const
 
-// Thresholds for detection
-const THRESHOLDS = {
+// Thresholds for detection - exported for testing
+export const THRESHOLDS = {
   // How much higher (in Y) wrists must be above shoulders for "arms up"
-  ARMS_UP_MARGIN: 0.05,
+  ARMS_UP_MARGIN: 0.2,
   // Minimum X distance between ankles relative to hip width for "feet apart"
   FEET_SPREAD_RATIO: 2.0,
   // Minimum visibility to trust a landmark
   MIN_VISIBILITY: 0.3, // Lowered to be more forgiving
+  // Minimum time (ms) between state changes to prevent gaming
+  STATE_CHANGE_DEBOUNCE_MS: 500,
 }
 
 export interface DebugInfo {
   armsUp: boolean | null
+  leftArmUp: boolean | null
+  rightArmUp: boolean | null
   feetApart: boolean | null
   leftWristY: number | null
   rightWristY: number | null
-  avgShoulderY: number | null
+  leftShoulderY: number | null
+  rightShoulderY: number | null
   leftAnkleVisible: boolean
   rightAnkleVisible: boolean
 }
@@ -65,11 +70,11 @@ function areArmsUp(pose: Landmark[]): boolean | null {
     return null
   }
 
-  const avgShoulderY = (leftShoulder.y + rightShoulder.y) / 2
-  const avgWristY = (leftWrist.y + rightWrist.y) / 2
+  // BOTH wrists must be above their respective shoulders (lower Y value)
+  const leftArmUp = leftWrist.y < leftShoulder.y - THRESHOLDS.ARMS_UP_MARGIN
+  const rightArmUp = rightWrist.y < rightShoulder.y - THRESHOLDS.ARMS_UP_MARGIN
 
-  // Wrists should be above shoulders (lower Y value)
-  return avgWristY < avgShoulderY - THRESHOLDS.ARMS_UP_MARGIN
+  return leftArmUp && rightArmUp
 }
 
 function areFeetApart(pose: Landmark[]): boolean | null {
@@ -100,15 +105,25 @@ export function getDebugInfo(pose: Landmark[]): DebugInfo {
   const leftAnkle = pose[LANDMARKS.LEFT_ANKLE]
   const rightAnkle = pose[LANDMARKS.RIGHT_ANKLE]
 
+  // Calculate individual arm status
+  const leftArmUp =
+    leftWrist && leftShoulder
+      ? leftWrist.y < leftShoulder.y - THRESHOLDS.ARMS_UP_MARGIN
+      : null
+  const rightArmUp =
+    rightWrist && rightShoulder
+      ? rightWrist.y < rightShoulder.y - THRESHOLDS.ARMS_UP_MARGIN
+      : null
+
   return {
     armsUp: areArmsUp(pose),
+    leftArmUp,
+    rightArmUp,
     feetApart: areFeetApart(pose),
     leftWristY: leftWrist?.y ?? null,
     rightWristY: rightWrist?.y ?? null,
-    avgShoulderY:
-      leftShoulder && rightShoulder
-        ? (leftShoulder.y + rightShoulder.y) / 2
-        : null,
+    leftShoulderY: leftShoulder?.y ?? null,
+    rightShoulderY: rightShoulder?.y ?? null,
     leftAnkleVisible: (leftAnkle?.visibility ?? 0) > THRESHOLDS.MIN_VISIBILITY,
     rightAnkleVisible: (rightAnkle?.visibility ?? 0) > THRESHOLDS.MIN_VISIBILITY,
   }
@@ -159,11 +174,13 @@ export interface JumpingJackDetector {
  * Create a jumping jack detector that counts reps.
  *
  * A rep is counted on completing a full cycle: down → up → down
+ * State changes are debounced to prevent gaming the system.
  */
 export function createJumpingJackDetector(): JumpingJackDetector {
   let reps = 0
   let currentState: JumpingJackState = 'unknown'
   let hasReachedUp = false
+  let lastStateChangeTime = 0
 
   return {
     processFrame(pose: Landmark[]): void {
@@ -174,18 +191,30 @@ export function createJumpingJackDetector(): JumpingJackDetector {
         return
       }
 
+      // Only process state changes, not same-state frames
+      if (newState === currentState) {
+        return
+      }
+
+      // Debounce: ignore state changes that happen too quickly
+      const now = Date.now()
+      if (now - lastStateChangeTime < THRESHOLDS.STATE_CHANGE_DEBOUNCE_MS) {
+        return
+      }
+
       // Track if we've reached the up position
       if (newState === 'up') {
         hasReachedUp = true
       }
 
       // Count rep when returning to down after reaching up
-      if (newState === 'down' && hasReachedUp && currentState !== 'down') {
+      if (newState === 'down' && hasReachedUp) {
         reps++
         hasReachedUp = false
       }
 
       currentState = newState
+      lastStateChangeTime = now
     },
 
     getReps(): number {
@@ -200,6 +229,7 @@ export function createJumpingJackDetector(): JumpingJackDetector {
       reps = 0
       currentState = 'unknown'
       hasReachedUp = false
+      lastStateChangeTime = 0
     },
   }
 }

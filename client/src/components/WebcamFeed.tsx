@@ -180,7 +180,19 @@ export function WebcamFeed({ onExerciseComplete, targetReps }: WebcamFeedProps) 
               {detectorRef.current.getState()}
             </span>
           </div>
-          <div>Arms up: {debugInfo.armsUp === null ? '?' : debugInfo.armsUp ? '✓' : '✗'}</div>
+          <div>
+            Arms:{' '}
+            <span className={debugInfo.leftArmUp ? 'text-green-400' : 'text-red-400'}>
+              L{debugInfo.leftArmUp === null ? '?' : debugInfo.leftArmUp ? '✓' : '✗'}
+            </span>{' '}
+            <span className={debugInfo.rightArmUp ? 'text-green-400' : 'text-red-400'}>
+              R{debugInfo.rightArmUp === null ? '?' : debugInfo.rightArmUp ? '✓' : '✗'}
+            </span>
+            {' → '}
+            <span className={debugInfo.armsUp ? 'text-green-400' : 'text-zinc-400'}>
+              {debugInfo.armsUp ? 'BOTH UP' : 'waiting'}
+            </span>
+          </div>
           <div>Feet apart: {debugInfo.feetApart === null ? '? (not visible)' : debugInfo.feetApart ? '✓' : '✗'}</div>
           <div className="text-zinc-400 text-[10px] mt-1">
             Ankles: {debugInfo.leftAnkleVisible ? 'L✓' : 'L✗'} {debugInfo.rightAnkleVisible ? 'R✓' : 'R✗'}
