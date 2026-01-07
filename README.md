@@ -4,6 +4,8 @@ Earn Claude Code requests through physical exercise.
 
 A Claude Code plugin that gates LLM requests behind real exercise. Complete 20 jumping jacks on camera, earn 1 request. No exercise, no AI.
 
+![](jumpingjacks.gif)
+
 ## How it Works
 
 1. **Server** tracks your request balance in SQLite
