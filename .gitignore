@@ -38,3 +38,6 @@ htmlcov/
 # Claude Code local settings
 .claude/
 CLAUDE.md
+
+# Social media posts (not for version control)
+posts/

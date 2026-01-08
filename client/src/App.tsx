@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback } from 'react'
 import { WebcamFeed } from './components/WebcamFeed'
 import { RepCounter } from './components/RepCounter'
 import { RequestBalance } from './components/RequestBalance'
+import { LifetimeStats } from './components/LifetimeStats'
 import { Toast } from './components/Toast'
 import { createWebSocketClient, type WebSocketClient } from './lib/websocket'
 import { useStore } from './store/useStore'
@@ -78,6 +79,7 @@ function App() {
           <div className="space-y-6">
             <RequestBalance />
             <RepCounter targetReps={TARGET_REPS} />
+            <LifetimeStats />
           </div>
         </div>
 
